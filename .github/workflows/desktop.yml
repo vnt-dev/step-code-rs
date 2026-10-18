@@ -1,0 +1,127 @@
+name: Build desktop
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Desktop (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bundles: nsis,msi
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            bundles: app,dmg
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            bundles: app,dmg
+    defaults:
+      run:
+        working-directory: apps/desktop
+        shell: bash
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/target
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> ../../../target
+          key: desktop-${{ matrix.target }}
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Test frontend
+        run: npm test
+
+      - name: Build installers
+        env:
+          # Pull requests never receive signing credentials, including same-repo PRs.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ github.event_name != 'pull_request' && secrets.TAURI_SIGNING_PRIVATE_KEY || '' }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ github.event_name != 'pull_request' && secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD || '' }}
+          # Ad-hoc macOS signing works without an Apple Developer certificate.
+          APPLE_SIGNING_IDENTITY: '-'
+        run: |
+          args=(--ci --target "${{ matrix.target }}" --bundles "${{ matrix.bundles }}")
+          if [[ -n "$TAURI_SIGNING_PRIVATE_KEY" ]]; then
+            args+=(--config src-tauri/tauri.signing.conf.json)
+          else
+            echo 'No updater signing key configured; building installers without updater signatures.'
+          fi
+          npm run tauri -- build "${args[@]}" -- --locked
+
+      - name: Upload installers and updater signatures
+        uses: actions/upload-artifact@v4
+        with:
+          name: step-code-${{ matrix.target }}
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            target/${{ matrix.target }}/release/bundle/nsis/*.exe
+            target/${{ matrix.target }}/release/bundle/nsis/*.sig
+            target/${{ matrix.target }}/release/bundle/msi/*.msi
+            target/${{ matrix.target }}/release/bundle/msi/*.sig
+            target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+            target/${{ matrix.target }}/release/bundle/macos/*.tar.gz
+            target/${{ matrix.target }}/release/bundle/macos/*.sig
+
+  release:
+    name: Publish desktop release
+    needs: build
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all desktop builds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: step-code-*
+          path: release-artifacts
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          for artifact in release-artifacts/step-code-*; do
+            # macOS updater archives share a filename across architectures.
+            prefix="${artifact##*/}"
+            while IFS= read -r -d '' file; do
+              cp "$file" "release-assets/${prefix}-${file##*/}"
+            done < <(find "$artifact" -type f -print0)
+          done
+
+      - name: Publish installers and updater signatures
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: release-assets/*
