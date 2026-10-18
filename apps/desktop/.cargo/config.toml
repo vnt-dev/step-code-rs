@@ -1,0 +1,3 @@
+[build]
+# Cargo resolves this relative to apps/desktop (the parent of .cargo).
+target-dir = "../../target"

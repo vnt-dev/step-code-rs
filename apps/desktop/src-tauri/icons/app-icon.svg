@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="25 0 145 145" shape-rendering="crispEdges">
+  <title>Step Code — pixel duck on a bicycle</title>
+  <g fill="#aa8ef0">
+    <!-- Duck silhouette, preserving the reference's stepped pixel edges. -->
+    <path d="M71 20h27v6h6v7h7v13h-7v33h7v7H58v-7h-7v-6h-7v-7h7v-6h-7v-7h14V33h6v-7h7z"/>
+    <!-- Rear wheel. -->
+    <path d="M51 86h20v6H51zM44 92h7v7h-7zM38 99h6v13h-6zM44 112h7v7h-7zM51 119h20v6H51zM71 112h7v7h-7zM78 99h6v13h-6zM71 92h7v7h-7z"/>
+    <!-- Front wheel. -->
+    <path d="M117 79h27v7h-27zM111 86h6v6h-6zM104 92h7v20h-7zM111 112h6v7h-6zM117 119h27v6h-27zM144 112h7v7h-7zM151 92h6v20h-6zM144 86h7v6h-7z"/>
+    <!-- Bicycle frame and crank. -->
+    <path d="M58 99h39v7H58zM78 106h6v6h-6zM97 99h47v7H97zM117 92h7v20h-7zM117 106h27v6h-27zM131 92h6v7h-6z"/>
+  </g>
+  <path fill="#f5d76b" d="M104 46h47v7h-7v7h-13v6h-14v7h-13zM71 86h7v6h6v7H71zM91 86h7v13h6v7H91z"/>
+  <path fill="#252530" d="M71 40h13v13H71z"/>
+  <path fill="#fff7df" d="M78 46h6v7h-6z"/>
+</svg>

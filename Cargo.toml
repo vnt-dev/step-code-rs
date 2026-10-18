@@ -1,0 +1,18 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/telemetry",
+    "crates/providers",
+    "crates/agent-core",
+    "crates/coding-agent",
+]
+# The Tauri app is built on its own (`cargo tauri dev` in apps/desktop): its
+# build script emits link-search paths that would otherwise leak into every
+# other crate's test binaries during a workspace-wide build.
+exclude = ["apps/desktop/src-tauri"]
+
+[workspace.dependencies]
+step-harness-telemetry = { path = "crates/telemetry" }
+step-harness-providers = { path = "crates/providers" }
+step-harness-agent-core = { path = "crates/agent-core" }
+step-harness-coding-agent = { path = "crates/coding-agent" }

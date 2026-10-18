@@ -1,0 +1,49 @@
+[package]
+name = "step-harness-agent-core"
+version = "0.84.4"
+edition = "2024"
+license = "MIT"
+description = "Stateful agent with tool execution, session persistence, context compaction, and event streaming"
+keywords = ["agent", "llm", "tools", "session"]
+
+[dependencies]
+async-trait = "0.1.92"
+base64 = "0.23.1"
+dirs = "6.0.0"
+encoding_rs = "0.8"
+eventsource-stream = "0.2"
+futures = "0.3.34"
+globset = "0.4.18"
+ignore = "0.4.25"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp"] }
+png = "0.18"
+process-wrap = { version = "10", features = ["tokio1"] }
+regex = "1.13.1"
+reqwest = { version = "0.13.5", default-features = false, features = [
+	"json",
+	"stream",
+	"rustls",
+	"http2",
+	"charset",
+] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.152", features = ["preserve_order"] }
+serde-saphyr = "1.3"
+similar = "2.7.0"
+step-harness-providers = { path = "../providers" }
+step-harness-telemetry = { path = "../telemetry" }
+thiserror = "2.0.21"
+tempfile = "3.23.0"
+time = "0.3"
+tokio = { version = "1.53.2", features = ["rt", "sync", "time", "macros", "fs", "process"] }
+tokio-util = "0.7.20"
+unicode-normalization = "0.1.25"
+uuid = { version = "1.28.0", features = ["v7"] }
+url = "2.5"
+which = "8"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = ["Win32_System_Threading"] }
+
+[dev-dependencies]
+tokio = { version = "1.53.2", features = ["rt-multi-thread", "macros", "test-util"] }

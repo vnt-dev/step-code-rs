@@ -1,0 +1,23 @@
+target/
+/.idea/
+node_modules/
+dist/
+*.log
+*.log.*
+
+# Local environment files; sanitized examples can be committed.
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.template
+
+# Local application settings, credentials and session history.
+.step-rs/
+
+# Private key material.
+*.key
+*.pem
+*.p12
+*.pfx

@@ -1,0 +1,31 @@
+{
+  "name": "step-code-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "icons": "node scripts/gen-icons.mjs",
+    "test": "node scripts/test-messages.mjs && node scripts/test-projects.mjs && node scripts/test-drafts.mjs && node scripts/test-model-form.mjs && node scripts/test-session-view.mjs && node scripts/test-use-elapsed.mjs && node scripts/test-thinking-indicator.mjs && node scripts/test-markdown-table.mjs && node scripts/test-round-tps.mjs && node scripts/test-context-usage.mjs && node scripts/test-usage-statistics.mjs && node scripts/test-request-metrics.mjs && node scripts/test-tool-presentation.mjs && node scripts/test-message-scroll.mjs",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "rehype-highlight": "^7.0.2",
+    "highlight.js": "^11.11.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.6.0",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.0"
+  }
+}
